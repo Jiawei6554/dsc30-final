@@ -16,20 +16,30 @@ public abstract class Post implements Comparable<Post> {
     private String keyword;
 
     /**
-     * Constructor for Post
+     * Constructor for Post, text, keyword,
+     * and PEID is unknown, we’ll set the text as an empty string
+     * and set the keyword and PEID as null.
      *
      * @param poster the poster of the post
      * @param header the header of the post
      */
     public Post(User poster, String header, String UID) {
-        // TODO
+        this(poster, header, "", null, null, UID);
     }
 
     /**
      * Overloaded constructor for Post
      */
     public Post(User poster, String header, String text, String keyword, String PEID, String UID) {
-        // TODO
+        this.poster = poster;
+        this.header = header;
+        this.text = text;
+        this.keyword = keyword;
+        this.parentPEID = PEID;
+        this.UID = UID;
+
+        this.date = LocalDate.now();
+        this.priority = 0;
     }
 
     /**
@@ -37,8 +47,7 @@ public abstract class Post implements Comparable<Post> {
      * @return the keyword of the post
      */
     public String getKeyword() {
-        // TODO
-        return null;
+        return this.keyword;
     }
 
     /**
@@ -48,8 +57,7 @@ public abstract class Post implements Comparable<Post> {
     public abstract String getText(User u) throws OperationDeniedException;
 
     public LocalDate getDate() {
-        // TODO
-        return null;
+        return this.date;
     }
 
     /**
@@ -58,16 +66,19 @@ public abstract class Post implements Comparable<Post> {
      * @param newDate the new date we are setting the post to
      */
     public void setDate(LocalDate newDate) {
-        // TODO
+        this.date = newDate;
     }
 
+    /**
+     * return the poster user object
+     * @return poster
+     */
     public User getPoster() {
-        // TODO
-        return null;
+        return this.poster;
     }
 
     public void editText(String text) {
-        // TODO
+        this.text = text;
     }
 
     public String toString() {
@@ -82,7 +93,7 @@ public abstract class Post implements Comparable<Post> {
      * @return whether this post is larger than the other post
      */
     public int compareTo(Post other){
-        // TODO
+        if (this.calculatePriority() > other.calculatePriority()) return 1;
         return 0;
     }
 

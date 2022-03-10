@@ -10,6 +10,9 @@ public abstract class User {
     ArrayList<Post> posts;
     ArrayList<PiazzaExchange> courses;
 
+    private static final int DAILY_STATS = 1;
+    private static final int MONTHLY_STATS = 2;
+
     /**
      * Constructor for the User abstract class
      *
@@ -17,7 +20,8 @@ public abstract class User {
      * @param username the username of the user
      */
     public User(String PID, String username) {
-        // TODO
+        this.PID = PID;
+        this.username = username;
     }
 
     /**
@@ -27,8 +31,7 @@ public abstract class User {
      * @return whether the action is successful
      */
     public boolean enrollClass(PiazzaExchange piazza) {
-        // TODO
-        return false;
+        return piazza.enrollUserToDatabase(this);
     }
 
 
@@ -50,8 +53,12 @@ public abstract class User {
      * @throws OperationDeniedException when the action is denied
      */
     public boolean addPost(PiazzaExchange pe, Post p) throws OperationDeniedException {
-        // TODO
-        return false;
+        try {
+            pe.addPostToDatabase(this, p);
+            return true;
+        } catch (OperationDeniedException e) {
+            throw e;
+        }
     }
 
     /**
@@ -61,8 +68,11 @@ public abstract class User {
      * @return the statistic of the user
      */
     public int[] requestStats(PiazzaExchange p, int option) throws OperationDeniedException{
-        // TODO
-        return null;
+        switch (option) {
+            case DAILY_STATS: return p.computeDailyPostStats();
+            case MONTHLY_STATS: return p.computeMonthlyPostStats();
+            default: throw new OperationDeniedException();
+        }
     }
 
     ////////////// Stats querying method BEGINS /////////////
@@ -131,7 +141,7 @@ public abstract class User {
     /**
      * gets top two endorsed posts (by number of endorsements)
      *
-     * @param p the post the user want to endorse
+     * @param pe the post the user want to endorse
      * @return top two posts
      */
     public Post[] getTopTwoEndorsedPosts(PiazzaExchange pe){

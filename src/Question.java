@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Question extends Post {
 
     boolean answered;
@@ -9,7 +11,9 @@ public class Question extends Post {
      * @param header the summary of this question
      */
     public Question(User poster, String header, String UID) {
-        // TODO
+        super(poster, header, UID);
+        answered = false;
+        answers = new ArrayList<String>();
     }
 
     /**
@@ -22,14 +26,30 @@ public class Question extends Post {
      * @param PEID the unique identification ID of course ID
      */
     public Question(User poster, String header, String question, String keyword, String PEID, String UID){
-        // TODO
+        super(poster, header, question, keyword, PEID, UID);
+        answered = false;
+        answers = new ArrayList<String>();
     }
 
     /**
-     * getter method for text
+     * Returns the text of the question post. Tutors and instructors are able to access
+     * all of the questions. Students are only able to view/get public questions,
+     * or private questions posted by the user. If a student requests a private question
+     * post that isn’t written by him/her, OperationDeniedException should be thrown to
+     * signify that this operation is invalid.
      */
     public String getText(User u) throws OperationDeniedException {
-        // TODO
+        if (u instanceof Student) {
+            //case public text
+            if (this.isPrivate == false) return this.text;
+            //case owned question
+            if (u == this.poster) return this.text;
+
+            throw new OperationDeniedException();
+        }
+        if (u instanceof Tutor || u instanceof Instructor) return this.text;
+
+        //should not be reached
         return null;
     }
 
@@ -39,8 +59,8 @@ public class Question extends Post {
      * @return the status of the question
      */
     public String getStatus(){
-        // TODO
-        return null;
+        if (answered) return "Resolved";
+        return "Unresolved";
     }
 
     /**
@@ -60,7 +80,8 @@ public class Question extends Post {
      * @return whether the action is successful
      */
     public boolean answerQuestion(String s) {
-        // TODO
-        return false;
+        boolean added = answers.add(s);
+        if (added) answered = true;
+        return added;
     }
 }
