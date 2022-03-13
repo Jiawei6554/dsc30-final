@@ -2,39 +2,75 @@ import java.util.ArrayList;
 
 public class Instructor extends User{
 
+    static final String insPID = "A0000";
+
     public Instructor(String username) {
-        // TODO
+        super(username, insPID);
     }
 
     public boolean answerQuestion(Post p, String response) {
-        // TODO
-        return true;
+        Boolean answered = ((Question) p).answerQuestion(response);
+        if (answered) {
+            ((Question) p).answered = true;
+            this.numOfPostsAnswered ++;
+            this.posts.add(p);
+            return true;
+        }
+
+        return false;
     }
 
     @Override
     public boolean endorsePost(Post p) {
-        // TODO
-        return true;
+        if (p.endorsedByCourseStaff == false) {
+            p.endorsementCount ++;
+            p.endorsedByCourseStaff = true;
+            return true;
+        }
+        p.poster.numOfEndorsement ++;
+        return false;
     }
 
     @Override
     public String displayName() {
-        // TODO
-        return null;
+        String display = "Instructor: ";
+        display += username;
+        display += ", PID:";
+        display += PID;
+        return display;
     }
 
+    /**
+     * attempt to delet the post
+     * when operation denied, return null
+     * when not deleted (piazza delete return false) return null
+     * when deleted return p
+     * @param p
+     * @param piazza
+     * @return
+     */
     public Post deletePost(Post p, PiazzaExchange piazza) {
-        // TODO
-        return null;
+
+        try {
+            Boolean deleted = piazza.deletePostFromDatabase(this, p);
+            if (deleted == false) return null;
+            return p;
+        } catch (OperationDeniedException e) {
+            return null;
+        }
     }
 
     public boolean inactivatePiazza(PiazzaExchange piazza) {
-        // TODO
-        return true;
+        return piazza.deactivatePiazza(this);
     }
 
     public boolean editPost(Post p, String newText){
-        return false;
+        p.editText(newText);
+        if (!this.posts.contains(p)) {
+            //this.posts.add(p);
+            this.numOfPostSubmitted ++ ;
+        }
+        return true;
     }
 
     /**
@@ -46,7 +82,7 @@ public class Instructor extends User{
      * @throws OperationDeniedException when the operation is denied
      */
     public Post[] getTopKUrgentQuestion(PiazzaExchange pe, int k) throws OperationDeniedException {
-        // TODO
-        return null;
+        Post[] top = pe.computeTopKUrgentQuestion(k);
+        return top;
     }
 }

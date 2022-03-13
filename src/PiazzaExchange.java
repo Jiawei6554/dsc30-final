@@ -25,7 +25,14 @@ public class PiazzaExchange {
      * @param selfEnroll whether the class allow self enrolling or not.
      */
     public PiazzaExchange(Instructor instructor, String courseID, boolean selfEnroll) {
-        // TODO
+        this.instructor = instructor;
+        this.courseID = courseID;
+        this.selfEnroll = selfEnroll;
+        this.status = "inactive";
+
+        users  = new ArrayList<>();
+        posts = new ArrayList<>();
+        unanswered = new ArrayList<>();
     }
 
     //is there a reason why we don't combine these two constructors?
@@ -38,12 +45,18 @@ public class PiazzaExchange {
      * @param roster the list of Users that will be included in this piazza
      */
     public PiazzaExchange(Instructor instructor, ArrayList<User> roster) {
-        // TODO
+        courseID = "DSC30";
+        selfEnroll = false;
+        users = roster;
+        this.instructor = instructor;
+
+        posts = new ArrayList<>();
+        unanswered = new ArrayList<>();
+
     }
 
     public Forest getKeywordForest() {
-        // TODO
-        return null;
+        return keywordForest;
     }
 
     /**
@@ -90,7 +103,13 @@ public class PiazzaExchange {
      * @return successfulness of the action call
      */
     public boolean activatePiazza(User u){
-        // TODO
+        //checking if is instructor
+        if (!(u instanceof Instructor)) return false;
+
+        if (this.status.equals("inactive")) {
+            this.status = "active";
+            return true;
+        }
         return false;
     }
 
@@ -101,7 +120,11 @@ public class PiazzaExchange {
      * @return successfulness of the action call
      */
     public boolean deactivatePiazza(User u){
-        // TODO
+        if (u == this.instructor && this.status.equals("active")) {
+            this.status = "inactive";
+            this.selfEnroll = false;
+            return true;
+        }
         return false;
     }
 
@@ -114,7 +137,19 @@ public class PiazzaExchange {
      * @return successfulness of the action call
      */
     public boolean enrollUserToDatabase(User requester, User u){
-        // TODO
+
+        //duplicated re-enroll
+        if (users.contains(u)) return false;
+
+        if (this.selfEnroll) {
+            this.users.add(u);
+            return true;
+        } else {
+            if ((requester instanceof Instructor)||(requester instanceof Tutor)) {
+                this.users.add(u);
+                return true;
+            }
+        }
         return false;
     }
 
@@ -125,8 +160,7 @@ public class PiazzaExchange {
      * @return successfulness of the action call
      */
     public boolean enrollUserToDatabase(User u){
-        // TODO
-        return false;
+        return enrollUserToDatabase(u, u);
     }
 
     ////////////// BEGIN BENCHMARKED METHOD /////////////
@@ -136,10 +170,16 @@ public class PiazzaExchange {
      *
      * @param u The user that initiate this add-post action
      * @param p the post that we are going to add to the database
-     * @throws OperationDeniedException when the action is not allowed
+     * @throws OperationDeniedException when the action is not allowed:
+     * thrown if (1) User u is not enrolled in this course or (2)course status is inactive.
      */
     public void addPostToDatabase(User u, Post p) throws OperationDeniedException {
-        // TODO
+        if (users.contains(u) == false | status.equals("inactive")) {
+            throw new OperationDeniedException();
+        }
+        posts.add(p);
+        u.numOfPostSubmitted ++;
+
     }
 
     /**
@@ -150,8 +190,14 @@ public class PiazzaExchange {
      * @return the post array that contains every single post that has the keyword
      */
     public Post[] retrievePost(User u, String keyword){
-        // TODO
-        return null;
+        ArrayList<Post> retrieved = new ArrayList<>();
+        for (Post p: posts) {
+            if ((p.poster == u) && (p.getKeyword().equals(keyword))) {
+                retrieved.add(p);
+            }
+        }
+        if (retrieved.size() == 0) return null;
+        return (Post[]) retrieved.toArray();
     }
 
     /**
@@ -161,8 +207,14 @@ public class PiazzaExchange {
      * @return the post array that contains every single post that has the keyword
      */
     public Post[] retrievePost(String keyword){
-        // TODO
-        return null;
+        ArrayList<Post> retrieved = new ArrayList<>();
+        for (Post p: posts) {
+            if (p.getKeyword().equals(keyword)) {
+                retrieved.add(p);
+            }
+        }
+        if (retrieved.size() == 0) return null;
+        return (Post[]) retrieved.toArray();
     }
 
     /**
@@ -172,7 +224,14 @@ public class PiazzaExchange {
      * @return the post array that contains every single post that has specified poster u
      */
     public Post[] retrievePost(User u) {
-        return null;
+        ArrayList<Post> retrieved = new ArrayList<>();
+        for (Post p: posts) {
+            if (p.poster == u) {
+                retrieved.add(p);
+            }
+        }
+        if (retrieved.size() == 0) return null;
+        return (Post[]) retrieved.toArray();
     }
 
     /**
@@ -185,8 +244,12 @@ public class PiazzaExchange {
      * @throws OperationDeniedException when the action is denied
      */
     public boolean deletePostFromDatabase(User u, Post p) throws OperationDeniedException {
-        // TODO
-        return false;
+        if ((u instanceof Instructor) == false) {
+            throw  new OperationDeniedException();
+        }
+        if (posts.contains(p) == false) return false;
+        posts.remove(p);
+        return true;
     }
 
     /**
@@ -196,8 +259,16 @@ public class PiazzaExchange {
      * @return the Post with the highest urgency rating
      */
     public Post computeMostUrgentQuestion() {
-        // TODO
-        return null;
+        Question top = null;
+
+        for (Post p: posts) {
+            if (p instanceof Question) {
+                if (top == null) top = (Question) p;
+                if (p.compareTo(top) > 0) top = (Question) p;
+            }
+        }
+
+        return top;
     }
 
     /**
@@ -208,7 +279,7 @@ public class PiazzaExchange {
      * @throws OperationDeniedException when the operation is denied
      */
     public Post[] computeTopKUrgentQuestion(int k) throws OperationDeniedException{
-        // TODO
+        Post[] urgent = new Post[k];
         return null;
     }
 
@@ -222,20 +293,57 @@ public class PiazzaExchange {
      * @throws OperationDeniedException when the operation is denied
      */
     public Post answerQuestion(User u, Post p, String response) throws OperationDeniedException{
-        // TODO
-        return null;
+        if (posts.contains(p) == false) throw new OperationDeniedException();
+        if (p instanceof Question == false) return p;
+        unanswered.remove(p);
+        u.answerQuestion(p, response);
+        return p;
     }
 
     ////////////// END BENCHMARKED METHOD /////////////
 
     /**
+     *Retrieves user u in String format. Students can only see their own stats,
      *
+     *  Tutors and instructors are able to access every student’s stats,
+     *  therefore you’ll print all of the students’ stats(don’t output tutor stats),
+     *  concatenated by a newline character between each students’ stats.
+     *  User stats should be in the order in which the user is added/enrolled,
+     *  so the first user being added to the piazzaExchange will be located at the first line,
+     *  and the last user added to the piazzaExchange will be located at the last line.
+     *  (where each line is defined by the separation of newline characters).
+     *  the last user stats shouldn’t be appended with newline character.
      * @param u
      * @return
      */
+
     public String viewStats(User u){
-        //TODO
-        return null;
+        if (u instanceof Student) return getStudentStat(u);
+
+        String stats = "";
+
+        for (User user: this.users) {
+            if (user instanceof Student) stats += getStudentStat(u);
+        }
+
+        //remove the trailing white space
+        return stats.trim();
+    }
+
+    /**
+     * format:
+     * “(user’s username) submitted (numOfPostSubmitted) posts, answered (numOfPostsAnswered) posts, received (numOfPostEndorsed) endorsements”
+     * @param u passed in an student object
+     */
+    private String getStudentStat(User u) {
+        String stats = String.format("%s submitted %d posts, " +
+                "answered %d posts, " +
+                "received %d endorsements",
+                u.username,
+                u.numOfPostSubmitted,
+                u.numOfPostsAnswered,
+                u.numOfEndorsement);
+        return stats;
     }
 
     /**
@@ -246,8 +354,11 @@ public class PiazzaExchange {
      *      in this piazza
      */
     public Post[] retrieveLog(User u){
-        // TODO
-        return null;
+        ArrayList<Post> log = new ArrayList<>();
+        for (Post p: u.posts) {
+            log.add(p);
+        }
+        return (Post[]) log.toArray();
     }
 
     //If the length > 10, students only be able to access the first 10 posts right?
@@ -260,7 +371,9 @@ public class PiazzaExchange {
      * @return the posts array that satisfy the conditions
      */
     public Post[] retrieveLog(User u, int length){
-        // TODO
+        if (u instanceof Student) {
+
+        }
         return null;
     }
 

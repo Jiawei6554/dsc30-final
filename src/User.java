@@ -13,6 +13,7 @@ public abstract class User {
     private static final int DAILY_STATS = 1;
     private static final int MONTHLY_STATS = 2;
 
+    static final int MAX_RE_LEN = 50;
     /**
      * Constructor for the User abstract class
      *

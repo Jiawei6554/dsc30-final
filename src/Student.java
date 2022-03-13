@@ -1,8 +1,5 @@
 public class Student extends User{
 
-    private static final int MAX_RE_LEN = 50;
-
-
     public Student(String PID, String username) {
         super(PID, username);
     }
@@ -25,7 +22,8 @@ public class Student extends User{
         if (!(p instanceof Question)) {
             return false;
         }
-        if (response.length() > MAX_RE_LEN) {
+        int wordCount = response.split("\\s+").length;
+        if (wordCount > MAX_RE_LEN) {
             return false;
         }
         if (p.isPrivate && p.getPoster() != this) {
@@ -51,7 +49,7 @@ public class Student extends User{
      */
     @Override
     public boolean endorsePost(Post p) {
-        if (!p.isPrivate) {
+        if (!p.isPrivate | p.poster == this) {
             p.endorsementCount ++;
             return true;
         }

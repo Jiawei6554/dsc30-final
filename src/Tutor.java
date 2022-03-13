@@ -2,31 +2,55 @@ public class Tutor extends User{
 
 
     public Tutor(String PID, String username){
-        // TODO
+        super(PID, username);
 
     }
 
     public boolean answerQuestion(Post p, String response){
-        // TODO
+        Boolean answered = ((Question) p).answerQuestion(response);
+        if (answered) {
+            ((Question) p).answered = true;
+            this.numOfPostsAnswered ++;
+            this.posts.add(p);
+            return true;
+        }
+
         return false;
     }
 
+    /**
+     * Displays the name of the tutor object in the following format:
+     * "Tutor: username_of_tutor, PID: PID”
+     * @return
+     */
     @Override
     public String displayName() {
-        // TODO
-        return null;
+        String display = "Tutor: ";
+        display += username;
+        display += ", PID:";
+        display += PID;
+        return display;
     }
 
     @Override
     public boolean endorsePost(Post p){
-        // TODO
+        if (p.endorsedByCourseStaff == false) {
+            p.endorsementCount ++;
+            p.endorsedByCourseStaff = true;
+            return true;
+        }
+        p.poster.numOfEndorsement ++;
         return false;
     }
 
     @Override
     public boolean editPost(Post p, String newText) {
-        //TODO
-        return false;
+        p.editText(newText);
+        if (!this.posts.contains(p)) {
+            //this.posts.add(p);
+            this.numOfPostSubmitted ++ ;
+        }
+        return true;
     }
 
     /**
@@ -38,8 +62,8 @@ public class Tutor extends User{
      * @throws OperationDeniedException when the operation is denied
      */
     public Post[] getTopKUrgentQuestion(PiazzaExchange pe, int k) throws OperationDeniedException {
-        // TODO
-        return null;
+        Post[] top = pe.computeTopKUrgentQuestion(k);
+        return top;
     }
 
 
