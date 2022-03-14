@@ -138,6 +138,9 @@ public class PiazzaExchange {
      */
     public boolean enrollUserToDatabase(User requester, User u){
 
+        //inactive course check
+        if (this.status == "inactive") return false;
+
         //duplicated re-enroll
         if (users.contains(u)) return false;
 
