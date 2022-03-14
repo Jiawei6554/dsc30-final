@@ -35,7 +35,7 @@ public class Instructor extends User{
     public String displayName() {
         String display = "Instructor: ";
         display += username;
-        display += ", PID:";
+        display += ", PID: ";
         display += PID;
         return display;
     }
