@@ -31,6 +31,7 @@ public class PiazzaExchange {
         this.status = "inactive";
 
         users  = new ArrayList<>();
+        users.add(instructor);
         posts = new ArrayList<>();
         unanswered = new ArrayList<>();
     }
@@ -120,7 +121,7 @@ public class PiazzaExchange {
      * @return successfulness of the action call
      */
     public boolean deactivatePiazza(User u){
-        if (u == this.instructor && this.status.equals("active")) {
+        if (u instanceof Instructor && this.status.equals("active")) {
             this.status = "inactive";
             this.selfEnroll = false;
             return true;
