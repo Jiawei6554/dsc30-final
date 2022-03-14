@@ -5,7 +5,7 @@ public class Instructor extends User{
     static final String insPID = "A0000";
 
     public Instructor(String username) {
-        super(username, insPID);
+        super(insPID, username);
     }
 
     public boolean answerQuestion(Post p, String response) {
