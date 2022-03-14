@@ -177,9 +177,11 @@ public class PiazzaExchange {
      * thrown if (1) User u is not enrolled in this course or (2)course status is inactive.
      */
     public void addPostToDatabase(User u, Post p) throws OperationDeniedException {
-        if (users.contains(u) == false | status.equals("inactive")) {
-            throw new OperationDeniedException();
-        }
+
+        if (users.contains(u) == false) throw new OperationDeniedException();
+
+        if (status.equals("inactive")) throw new OperationDeniedException();
+
         posts.add(p);
         u.numOfPostSubmitted ++;
 
