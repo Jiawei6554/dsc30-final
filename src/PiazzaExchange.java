@@ -145,7 +145,7 @@ public class PiazzaExchange {
             this.users.add(u);
             return true;
         } else {
-            if ((requester instanceof Instructor)||(requester instanceof Tutor)) {
+            if ((requester instanceof Instructor) | (requester instanceof Tutor)) {
                 this.users.add(u);
                 return true;
             }

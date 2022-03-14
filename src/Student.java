@@ -87,7 +87,7 @@ public class Student extends User{
     public String displayName() {
         String dis = "Student: ";
         dis += username;
-        dis += ", PID:";
+        dis += ", PID: ";
         dis += PID;
         return dis;
     }
