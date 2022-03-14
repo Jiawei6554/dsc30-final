@@ -23,6 +23,8 @@ public abstract class User {
     public User(String PID, String username) {
         this.PID = PID;
         this.username = username;
+        posts = new ArrayList<Post>();
+        courses = new ArrayList<PiazzaExchange>();
     }
 
     /**

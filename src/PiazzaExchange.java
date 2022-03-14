@@ -197,7 +197,7 @@ public class PiazzaExchange {
             }
         }
         if (retrieved.size() == 0) return null;
-        return (Post[]) retrieved.toArray();
+        return retrieved.toArray(new Post[retrieved.size()]);
     }
 
     /**
@@ -214,7 +214,7 @@ public class PiazzaExchange {
             }
         }
         if (retrieved.size() == 0) return null;
-        return (Post[]) retrieved.toArray();
+        return retrieved.toArray(new Post[retrieved.size()]);
     }
 
     /**
@@ -231,7 +231,7 @@ public class PiazzaExchange {
             }
         }
         if (retrieved.size() == 0) return null;
-        return (Post[]) retrieved.toArray();
+        return retrieved.toArray(new Post[retrieved.size()]);
     }
 
     /**

@@ -85,7 +85,8 @@ public class Student extends User{
      */
     @Override
     public String displayName() {
-        String dis = username;
+        String dis = "Student: ";
+        dis += username;
         dis += ", PID:";
         dis += PID;
         return dis;
