@@ -27,7 +27,7 @@ public class Tutor extends User{
     public String displayName() {
         String display = "Tutor: ";
         display += username;
-        display += ", PID:";
+        display += ", PID: ";
         display += PID;
         return display;
     }
