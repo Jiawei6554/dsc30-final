@@ -141,6 +141,8 @@ public class PiazzaExchange {
 
         //inactive course check
         System.out.println("null check: ");
+
+        System.out.println(status);
         System.out.println(status == null);
         if (this.status.equals("inactive")) return false;
         System.out.println("mannualy checking: ");
