@@ -29,8 +29,7 @@ public class PiazzaExchange {
         this.courseID = courseID;
         this.selfEnroll = selfEnroll;
         this.status = "inactive";
-        System.out.print("initialized status to be:");
-        System.out.println(status);
+
         users  = new ArrayList<>();
         users.add(instructor);
         posts = new ArrayList<>();
@@ -47,14 +46,10 @@ public class PiazzaExchange {
      * @param roster the list of Users that will be included in this piazza
      */
     public PiazzaExchange(Instructor instructor, ArrayList<User> roster) {
-        courseID = "DSC30";
-        selfEnroll = false;
+        //calling the 3-arg constructor
+        this(instructor, "DSC30", false);
+
         users = roster;
-        this.instructor = instructor;
-
-        posts = new ArrayList<>();
-        unanswered = new ArrayList<>();
-
     }
 
     public Forest getKeywordForest() {
@@ -141,13 +136,8 @@ public class PiazzaExchange {
     public boolean enrollUserToDatabase(User requester, User u){
 
         //inactive course check
-        System.out.println("null check: ");
-
-        System.out.println(status);
-        System.out.println(status == null);
         if (this.status.equals("inactive")) return false;
-        System.out.println("mannualy checking: ");
-        System.out.println(status);
+
         //duplicated re-enroll
         if (users.contains(u)) return false;
 
