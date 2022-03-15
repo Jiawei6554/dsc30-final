@@ -29,7 +29,8 @@ public class PiazzaExchange {
         this.courseID = courseID;
         this.selfEnroll = selfEnroll;
         this.status = "inactive";
-
+        System.out.print("initialized status to be:");
+        System.out.println(status);
         users  = new ArrayList<>();
         users.add(instructor);
         posts = new ArrayList<>();
