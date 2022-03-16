@@ -237,8 +237,10 @@ public class PiazzaExchange {
     }
 
     /**
-     * delete the post from the PE. User should be either the creator of the post or a course staff
-     * return whether the post got successfully deleted or not
+     * If a student or tutor requested to delete a post,
+     * OperationDeniedException will be thrown”
+     * Only the instructor enrolled in this course
+     * are allowed to delete posts from the database
      *
      * @param u the user who initiate this action
      * @param p the post to delete
@@ -249,6 +251,7 @@ public class PiazzaExchange {
         if ((u instanceof Instructor) == false) {
             throw  new OperationDeniedException();
         }
+        if (u != instructor) return false;
         if (posts.contains(p) == false) return false;
         posts.remove(p);
         return true;

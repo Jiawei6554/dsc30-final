@@ -1,5 +1,6 @@
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class Forest {
 
@@ -19,7 +20,9 @@ public class Forest {
          * @param key      Node's key
          */
         public InternalNode(String key, Post post) {
-            // TODO
+            this.key = key;
+            this.posts.add(post);
+            children = new ArrayList<>();
         }
 
         /**
@@ -30,7 +33,9 @@ public class Forest {
          * @param key Node's key
          */
         public InternalNode(String key) {
-            // TODO
+            this.key = key;
+            this.posts = new ArrayList<>();
+            this.children = new ArrayList<>();
         }
 
         /**
@@ -39,8 +44,7 @@ public class Forest {
          * @return The key
          */
         public String getKey() {
-            // TODO
-            return null;
+            return this.key;
         }
 
 
@@ -50,26 +54,23 @@ public class Forest {
          * @return The linked list of the node
          */
         public ArrayList<Post> getPosts() {
-            // TODO
-            return null;
+            return this.posts;
         }
 
         public ArrayList<InternalNode> getChildren() {
-            // TODO
-            return null;
+            return this.children;
         }
 
         public void addChildren(InternalNode node) {
-            // TODO
+            children.add(node);
         }
 
         public void setChildren(ArrayList<InternalNode> children) {
-            // TODO
+            this.children = children;
         }
 
         public boolean removeChildren(InternalNode node) {
-            // TODO
-            return false;
+            return children.remove(node);
         }
 
         /**
@@ -78,7 +79,7 @@ public class Forest {
          * @param newPosts New linked list
          */
         public void setPostsList(ArrayList<Post> newPosts) {
-            // TODO
+            this.posts = newPosts;
         }
 
         /**
@@ -87,7 +88,7 @@ public class Forest {
          * @param data New data to be appended
          */
         public void addNewPost(Post data) {
-            // TODO
+            posts.add(data);
         }
 
         /**
@@ -98,8 +99,7 @@ public class Forest {
          * @return True if data was found, false otherwise
          */
         public boolean removePost(Post data) {
-            // TODO
-            return false;
+            return posts.remove(data);
         }
     }
 
@@ -107,7 +107,8 @@ public class Forest {
      * Constructor that initialize the instance variable of the forest
      */
     public Forest() {
-        // TODO
+        this.forest = new HashMap<>();
+        treeCount = 0;
     }
 
 
@@ -117,7 +118,10 @@ public class Forest {
      * @param key the key of the internal node
      */
     public void insert(String key) {
-       // TODO
+        //decapitalize
+        key = key.toLowerCase();
+
+        forest.put(key, new InternalNode(key));
     }
 
     /**
@@ -126,7 +130,11 @@ public class Forest {
      * @param post insert the post according to the post's key
      */
     public void insert(Post post) {
-        // TODO
+        String key = post.getKeyword().toLowerCase();
+
+        if (forest.containsKey(key) == false) insert(key);
+
+        forest.get(key).addNewPost(post);
     }
 
     /**
@@ -136,8 +144,9 @@ public class Forest {
      * @param key querying the internal node with this specific key
      */
     public InternalNode nodeLookUp(String key) {
-        // TODO
-        return null;
+        key = key.toLowerCase();
+        if (forest.containsKey(key) == false) return null;
+        return forest.get(key);
     }
 
     /**
@@ -148,8 +157,9 @@ public class Forest {
      * @return the Arraylist of posts
      */
     public ArrayList<Post> getPosts(String key) {
-        // TODO
-        return null;
+        key = key.toLowerCase();
+        if (forest.containsKey(key) == false) throw new IllegalArgumentException();
+        return nodeLookUp(key).getPosts();
     }
 
     /**
@@ -159,7 +169,14 @@ public class Forest {
      * @param children the array of children node's keys
      */
     public void addConnection(String parent, String[] children) {
-        // TODO
+        parent = parent.toLowerCase();
+        if (forest.containsKey(parent) == false) insert(parent);
+        InternalNode parentNode = forest.get(parent);
+
+        for (String c: children) {
+            if (forest.containsKey(c) == false) insert(c);
+            parentNode.addChildren(nodeLookUp(c));
+        }
     }
 
     /**
@@ -169,7 +186,7 @@ public class Forest {
      * @param child the key of the child key
      */
     public void addConnection(String parent, String child) {
-        // TODO
+        addConnection(parent, new String[] {child});
     }
 
     /**
@@ -180,7 +197,6 @@ public class Forest {
      * @return the children of that specific node
      */
     public String[] queryConnection(String key) {
-        // TODO
-        return null;
+       return null;
     }
 }
