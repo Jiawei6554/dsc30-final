@@ -235,7 +235,7 @@ public class PiazzaExchange {
     public Post[] retrievePost(String keyword){
         keyword = keyword.toLowerCase();
         ArrayList<Post> retrieved = keywordsPosts.get(keyword);
-
+        System.out.println(retrieved == null);
         return retrieved.toArray(new Post[retrieved.size()]);
     }
 
