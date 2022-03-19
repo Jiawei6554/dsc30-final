@@ -237,6 +237,7 @@ public class PiazzaExchange {
         ArrayList<Post> retrieved = keywordsPosts.get(keyword);
         System.out.println(retrieved == null);
         System.out.println(keywordsPosts.size());
+        if (retrieved == null) return null;
         return retrieved.toArray(new Post[retrieved.size()]);
     }
 
