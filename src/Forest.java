@@ -142,9 +142,8 @@ public class Forest {
      * 
      * @param key querying the internal node with this specific key
      */
-    public InternalNode nodeLookUp(String key) {
+    private InternalNode nodeLookUp(String key) {
         key = key.toLowerCase();
-        if (forest.containsKey(key) == false) return null;
         return forest.get(key);
     }
 

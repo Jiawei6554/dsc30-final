@@ -501,9 +501,28 @@ public class PiazzaExchange {
      * @param k the number of similar post that we are querying
      */
     public Post[] computeKSimilarPosts(String keyword, int k) {
-        keywordForest.getPosts(keyword);
 
-        return null;
+        Post[] similar = new Post[k];
+
+        keyword = keyword.toLowerCase();
+        ArrayList<Post> p = keywordForest.getPosts(keyword);
+        ArrayList<String> child = new ArrayList<>();
+
+        for (String childKey: keywordForest.queryConnection(keyword)) {
+            if (child.contains(childKey) == false) {
+                child.add(childKey);
+            }
+        }
+
+        for (String childKey: child) {
+            p.addAll(keywordForest.getPosts(childKey));
+        }
+
+        for (int i = 0; i < k; i++) {
+            if(i < p.size()) similar[i] = p.get(i);
+        }
+
+        return  similar;
     }
 
     /**
