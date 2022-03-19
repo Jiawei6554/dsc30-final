@@ -78,7 +78,8 @@ public class PiazzaExchangeTester {
                 scott.addPost(pe, p);
             }
         }
-        System.out.println(Arrays.toString(pe.computeKSimilarPosts("midterm", 20)));
+        System.out.println(pe.retrievePost("DLL").length);
+        //System.out.println(Arrays.toString(pe.computeKSimilarPosts("midterm", 20)));
     }
 
 }

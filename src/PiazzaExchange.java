@@ -1,6 +1,7 @@
 import javafx.geometry.Pos;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
 
 public class PiazzaExchange {
@@ -69,8 +70,31 @@ public class PiazzaExchange {
      * @return two posts that has the highest endorsed
      */
     public Post[] computeTopTwoEndorsedPosts() {
-        // TODO
-        return null;
+
+        if(posts.size() == 1) return new Post[]{posts.get(0), null};
+
+        int maxEds = posts.get(0).endorsementCount;
+        Post max1 = null;
+        Post max2 = null;
+
+        for (Post p: posts) {
+            if (p.endorsementCount >= maxEds) {
+                max1 = p;
+                maxEds = p.endorsementCount;
+            }
+        }
+        maxEds = posts.get(0).endorsementCount;
+
+        for (Post p: posts) {
+            if (p.endorsementCount >= maxEds) {
+                if (p != max1) {
+                    max2 = p;
+                    maxEds = p.endorsementCount;
+                }
+            }
+        }
+
+        return new Post[] {max1, max2};
     }
 
     
@@ -90,11 +114,14 @@ public class PiazzaExchange {
         int[] past = new int[30];
 
         for (int i = 0; i < 30; i++) {
-
+            LocalDate hist = today.minusDays(i);
+            for(Post p: posts) {
+                if (p.getDate().equals(hist)) {
+                    past[i] = past[i] + 1;
+                }
+            }
         }
-
-
-        return null;
+        return past;
     }
 
     /**
@@ -103,8 +130,20 @@ public class PiazzaExchange {
      * @return integer array that indicates the monthly status.
      */
     public int[] computeMonthlyPostStats(){
-        // TODO
-        return null;
+        LocalDate today = LocalDate.now();
+        int[] past = new int[12];
+
+        for (int i = 0; i < 12; i++) {
+            LocalDate hist = today.minusMonths(i);
+            for(Post p: posts) {
+                if (p.getDate().getMonth() == hist.getMonth()) {
+                    if (p.getDate().getYear() == hist.getYear()) {
+                        past[i] = past[i] + 1;
+                    }
+                }
+            }
+        }
+        return past;
     }
 
     /**
@@ -197,6 +236,7 @@ public class PiazzaExchange {
         u.numOfPostSubmitted ++;
 
         updateKeywordsPosts(p);
+        keywordForest.insert(p);
     }
 
     private void updateKeywordsPosts(Post p) {
@@ -235,8 +275,8 @@ public class PiazzaExchange {
     public Post[] retrievePost(String keyword){
         keyword = keyword.toLowerCase();
         ArrayList<Post> retrieved = keywordsPosts.get(keyword);
-        System.out.println(retrieved == null);
-        System.out.println(keywordsPosts.size());
+        //System.out.println(retrieved == null);
+        //System.out.println(keywordsPosts.size());
         if (retrieved == null) return null;
         return retrieved.toArray(new Post[retrieved.size()]);
     }
@@ -380,11 +420,7 @@ public class PiazzaExchange {
      *      in this piazza
      */
     public Post[] retrieveLog(User u){
-        ArrayList<Post> log = new ArrayList<>();
-        for (Post p: u.posts) {
-            log.add(p);
-        }
-        return (Post[]) log.toArray();
+        return (Post[]) posts.toArray();
     }
 
     //If the length > 10, students only be able to access the first 10 posts right?
@@ -399,9 +435,16 @@ public class PiazzaExchange {
     public Post[] retrieveLog(User u, int length){
 
         if (u instanceof Student) {
-
+            if (length > 10) length = 10;
         }
-        return null;
+        List<Post> retrieved = posts.subList(posts.size() - 10, posts.size());
+
+        Post[] arr = new Post[length];
+
+        for (int i = 0; i < length; i++) {
+            arr[i] = retrieved.get(length - i);
+        }
+        return arr;
     }
 
     private String[] getEleMultipleIndex(String[] arr, int[] indexes) {
@@ -458,20 +501,9 @@ public class PiazzaExchange {
      * @param k the number of similar post that we are querying
      */
     public Post[] computeKSimilarPosts(String keyword, int k) {
-        keyword = keyword.toLowerCase();
-        Post[] similar = new Post[k];
-        ArrayList<Post> p = keywordsPosts.get(keyword);
-        //System.out.println(p == null);
-        HashSet<String> searched = new HashSet<>();
-        String[] relatedKeys = keywordForest.queryConnection(keyword);
-        for (String key: relatedKeys) {
-            if (searched.contains(key) == false) {
-                searched.add(key);
-                p.addAll(keywordsPosts.get(key));
-            }
-        }
-        p = (ArrayList<Post>) p.subList(0, k);
-        return p.toArray(similar);
+        keywordForest.getPosts(keyword);
+
+        return null;
     }
 
     /**
