@@ -236,6 +236,7 @@ public class PiazzaExchange {
         keyword = keyword.toLowerCase();
         ArrayList<Post> retrieved = keywordsPosts.get(keyword);
         System.out.println(retrieved == null);
+        System.out.println(keywordsPosts.size());
         return retrieved.toArray(new Post[retrieved.size()]);
     }
 
@@ -459,7 +460,7 @@ public class PiazzaExchange {
         keyword = keyword.toLowerCase();
         Post[] similar = new Post[k];
         ArrayList<Post> p = keywordsPosts.get(keyword);
-        System.out.println(p == null);
+        //System.out.println(p == null);
         HashSet<String> searched = new HashSet<>();
         String[] relatedKeys = keywordForest.queryConnection(keyword);
         for (String key: relatedKeys) {
