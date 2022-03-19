@@ -86,7 +86,14 @@ public class PiazzaExchange {
      * @return integer array with the daily post status
      */
     public int[] computeDailyPostStats() {
-        // TODO
+        LocalDate today = LocalDate.now();
+        int[] past = new int[30];
+
+        for (int i = 0; i < 30; i++) {
+
+        }
+
+
         return null;
     }
 
@@ -452,6 +459,7 @@ public class PiazzaExchange {
         keyword = keyword.toLowerCase();
         Post[] similar = new Post[k];
         ArrayList<Post> p = keywordsPosts.get(keyword);
+        System.out.println(p == null);
         HashSet<String> searched = new HashSet<>();
         String[] relatedKeys = keywordForest.queryConnection(keyword);
         for (String key: relatedKeys) {
