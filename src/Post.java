@@ -100,8 +100,4 @@ public abstract class Post implements Comparable<Post> {
     public int calculatePriority() {
         return this.endorsementCount+(int)(this.date.until(LocalDate.now()).getDays()/3.0);
     }
-
-
-
-
 }

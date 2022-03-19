@@ -100,25 +100,50 @@ public abstract class User {
      * Requests the PiazzaExchange class to provide a set of posts associated with the user.
      * The option parameter specifies additional search filters.
      *
+     * option = 1: request all posts within this piazzaExchange associated with the user
+     * option = 2: request all posts related to the current user and with associated keywords,
+     * by calling retrievePost(User u, String keyword) in PiazzaExchange
+     * option = 3: request all posts related to the given keyword, by calling retrievePost(String keyword) in piazzaExchange
+     *
      * @param keyword keyword we are searching
      * @param option the different search type we want to perform
      * @param p the target piazza exchange
      * @return the post array
      */
     public Post[] getPost(String keyword, int option, PiazzaExchange p) {
-        // TODO
-        return null;
+        if (option == 1) {
+            return p.retrievePost(this);
+        } else if (option == 2) {
+            return p.retrievePost(this, keyword);
+        } else if (option == 3) {
+            return p.retrievePost(keyword);
+        } else {
+            return null;
+        }
     }
 
     /**
-     * initiate the action of getLog of a specific piazza
+     * Requests the PiazzaExchange class to provide the most recent logs/posts associated with the user.
+     * If length = k, you retrieve the most recent k posts(sorted by date of the post in descending order,
+     * where the most recent post is stored at index 0),  by calling retrieveLog will query across piazzaExchange posts and return it.
+     * If option = 1, you’ll get all posts related to the current piazzaExchange,  by calling retrieveLog(User u)
+     * If option = 2, you’ll get all posts related to the current user and with associated length, by calling retrieveLog(User u, int length) in piazzaExchange.
+     * If the value of option is not valid, OperationDeniedException will be thrown.
      * @param pe the target piazza
      * @param length the amount of logs to be retrieved
      * @param option the query type when retrieving log 
      * @return the post array
      */
     public Post[] getLog(int length, int option, PiazzaExchange pe) throws OperationDeniedException{
-        // TODO
+        if (length <= 0) throw new OperationDeniedException();
+        if (length > pe.posts.size()) throw new OperationDeniedException();
+
+        if (option == 1) {
+            return pe.retrieveLog(this);
+        } else if (option == 2) {
+            return pe.retrieveLog(this, length);
+        }
+
         return null;
     }
 

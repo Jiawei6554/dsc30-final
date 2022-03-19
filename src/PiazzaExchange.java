@@ -1,8 +1,7 @@
+import javafx.geometry.Pos;
+
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 
 public class PiazzaExchange {
 
@@ -10,10 +9,14 @@ public class PiazzaExchange {
     Instructor instructor;
     ArrayList<User> users;
     ArrayList<Post> posts;
-    ArrayList<Post> unanswered;
+    //ArrayList<Post> unanswered;
     String status;
     boolean selfEnroll;
     private Forest keywordForest;
+
+    HashMap<String, ArrayList<Post>> keywordsPosts;
+    PriorityQueue<Post> unanswered;
+
 
     private static final String STATS_STRING = "%s submitted %d posts, answered %d posts, received %d endorsements\n";
 
@@ -33,7 +36,12 @@ public class PiazzaExchange {
         users  = new ArrayList<>();
         users.add(instructor);
         posts = new ArrayList<>();
-        unanswered = new ArrayList<>();
+        unanswered = new PriorityQueue<>(new PriorityComparator());
+
+        keywordForest = new Forest();
+        initializeForest();
+
+        keywordsPosts = new HashMap<>();
     }
 
     //is there a reason why we don't combine these two constructors?
@@ -48,7 +56,6 @@ public class PiazzaExchange {
     public PiazzaExchange(Instructor instructor, ArrayList<User> roster) {
         //calling the 3-arg constructor
         this(instructor, "DSC30", false);
-
         users = roster;
     }
 
@@ -182,6 +189,15 @@ public class PiazzaExchange {
         posts.add(p);
         u.numOfPostSubmitted ++;
 
+        updateKeywordsPosts(p);
+    }
+
+    private void updateKeywordsPosts(Post p) {
+        String k = p.getKeyword().toLowerCase();
+        if (keywordsPosts.containsKey(k) == false) {
+            keywordsPosts.put(k, new ArrayList<Post>());
+        }
+        keywordsPosts.get(k).add(p);
     }
 
     /**
@@ -192,9 +208,10 @@ public class PiazzaExchange {
      * @return the post array that contains every single post that has the keyword
      */
     public Post[] retrievePost(User u, String keyword){
+        ArrayList<Post> filtered = keywordsPosts.get(keyword.toLowerCase());
         ArrayList<Post> retrieved = new ArrayList<>();
-        for (Post p: posts) {
-            if ((p.poster == u) && (p.getKeyword().equals(keyword))) {
+        for (Post p: filtered) {
+            if (p.poster == u) {
                 retrieved.add(p);
             }
         }
@@ -209,13 +226,9 @@ public class PiazzaExchange {
      * @return the post array that contains every single post that has the keyword
      */
     public Post[] retrievePost(String keyword){
-        ArrayList<Post> retrieved = new ArrayList<>();
-        for (Post p: posts) {
-            if (p.getKeyword().equals(keyword)) {
-                retrieved.add(p);
-            }
-        }
-        if (retrieved.size() == 0) return null;
+        keyword = keyword.toLowerCase();
+        ArrayList<Post> retrieved = keywordsPosts.get(keyword);
+
         return retrieved.toArray(new Post[retrieved.size()]);
     }
 
@@ -254,6 +267,7 @@ public class PiazzaExchange {
         if (u != instructor) return false;
         if (posts.contains(p) == false) return false;
         posts.remove(p);
+        keywordsPosts.get(p.getKeyword().toLowerCase()).remove(p);
         return true;
     }
 
@@ -264,16 +278,7 @@ public class PiazzaExchange {
      * @return the Post with the highest urgency rating
      */
     public Post computeMostUrgentQuestion() {
-        Question top = null;
-
-        for (Post p: posts) {
-            if (p instanceof Question) {
-                if (top == null) top = (Question) p;
-                if (p.compareTo(top) > 0) top = (Question) p;
-            }
-        }
-
-        return top;
+        return unanswered.peek();
     }
 
     /**
@@ -284,8 +289,15 @@ public class PiazzaExchange {
      * @throws OperationDeniedException when the operation is denied
      */
     public Post[] computeTopKUrgentQuestion(int k) throws OperationDeniedException{
+        if (k > unanswered.size()) throw new OperationDeniedException();
         Post[] urgent = new Post[k];
-        return null;
+        int pos = 0;
+
+        while (pos < k) {
+            urgent[pos] = unanswered.poll();
+        }
+        unanswered.addAll(Arrays.asList(urgent));
+        return urgent;
     }
 
     /**
@@ -376,6 +388,7 @@ public class PiazzaExchange {
      * @return the posts array that satisfy the conditions
      */
     public Post[] retrieveLog(User u, int length){
+
         if (u instanceof Student) {
 
         }
@@ -436,8 +449,19 @@ public class PiazzaExchange {
      * @param k the number of similar post that we are querying
      */
     public Post[] computeKSimilarPosts(String keyword, int k) {
-        // TODO
-        return null;
+        keyword = keyword.toLowerCase();
+        Post[] similar = new Post[k];
+        ArrayList<Post> p = keywordsPosts.get(keyword);
+        HashSet<String> searched = new HashSet<>();
+        String[] relatedKeys = keywordForest.queryConnection(keyword);
+        for (String key: relatedKeys) {
+            if (searched.contains(key) == false) {
+                searched.add(key);
+                p.addAll(keywordsPosts.get(key));
+            }
+        }
+        p = (ArrayList<Post>) p.subList(0, k);
+        return p.toArray(similar);
     }
 
     /**
