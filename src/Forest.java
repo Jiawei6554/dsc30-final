@@ -1,6 +1,4 @@
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.Locale;
+import java.util.*;
 
 public class Forest {
 
@@ -21,6 +19,7 @@ public class Forest {
          */
         public InternalNode(String key, Post post) {
             this.key = key;
+            this.posts = new ArrayList<>();
             this.posts.add(post);
             children = new ArrayList<>();
         }
@@ -169,14 +168,24 @@ public class Forest {
      * @param children the array of children node's keys
      */
     public void addConnection(String parent, String[] children) {
-        parent = parent.toLowerCase();
-        if (forest.containsKey(parent) == false) insert(parent);
-        InternalNode parentNode = forest.get(parent);
-
-        for (String c: children) {
-            if (forest.containsKey(c) == false) insert(c);
-            parentNode.addChildren(nodeLookUp(c));
+        InternalNode parentNode = nodeLookUp(parent);
+        if (parentNode == null) {
+            this.insert(parent);
+            parentNode = nodeLookUp(parent);
         }
+        ArrayList<InternalNode> childrenList = new ArrayList<>();
+        for (String key: children) {
+            key = key.toLowerCase();
+            InternalNode node = nodeLookUp(key);
+            if (node != null) {
+                childrenList.add(node);
+            } else {
+                // if not exist, store it as empty node as placeholder
+                this.insert(key);
+                childrenList.add(nodeLookUp(key));
+            }
+        }
+        parentNode.setChildren(childrenList);
     }
 
     /**
@@ -197,6 +206,41 @@ public class Forest {
      * @return the children of that specific node
      */
     public String[] queryConnection(String key) {
-       return null;
+        InternalNode root = nodeLookUp(key);
+        if (root == null) return null;
+        /*
+        HashSet<InternalNode> discovered = new HashSet<>();
+        ArrayList<InternalNode> visited = new ArrayList<>();
+
+        Queue<InternalNode> pending = new LinkedList<>();
+        pending.add(root);
+        discovered.add(root);
+
+        while (pending.isEmpty() == false) {
+            InternalNode currCheck = pending.remove();
+            discovered.add(currCheck);
+            for (InternalNode child: currCheck.getChildren()) {
+                if (discovered.contains(child) == false) {
+                    pending.add(child);
+                    discovered.add(child);
+                }
+            }
+            visited.add(currCheck);
+        }
+
+        String[] keywords = new String[visited.size()];
+        for (int i = 0; i < visited.size(); i++) {
+            keywords[i] = visited.get(i).getKey();
+        }
+         */
+
+        ArrayList<String> keys = new ArrayList<>();
+
+        for (InternalNode child: root.getChildren()) {
+            keys.add(child.getKey());
+        }
+
+        return keys.toArray(new String[keys.size()]);
     }
+
 }

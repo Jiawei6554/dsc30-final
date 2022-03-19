@@ -42,8 +42,8 @@ public class ForestTester {
                 "DLL", "SLL"};
         Question q;
         for (String keyword : keywords) {
-            //q = new Question(prof, placeHolder, placeHolder, keyword, placeHolder);
-            //forest.insert(q);
+            q = new Question(prof, placeHolder, placeHolder, keyword, placeHolder, placeHolder);
+            forest.insert(q);
         }
         forest.addConnection("Tree", new String[] {"heap", "BST"});
         forest.addConnection("Exam", new String[] {"midterm", "final project"});
